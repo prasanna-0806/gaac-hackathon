@@ -18,27 +18,30 @@ const stargazingSpots = [
     { name: "Coorg", coords: [12.3375, 75.8069] }
 ];
 
-// Function to fetch weather and AQI data
-async function fetchWeatherAndAQI(lat, lon) {
+// Function to fetch weather, AQI, and light pollution data
+async function fetchWeatherAQILight(lat, lon) {
     const weatherApiKey = 'c2c07ed68408e1730b71769f8740c726'; // Replace with your API key
     const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your API key
 
     try {
-        const [weatherResponse, aqiResponse] = await Promise.all([
+        const [weatherResponse, aqiResponse, lightPollutionResponse] = await Promise.all([
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}`),
-            fetch(`https://api.waqi.info/feed/here/?token=a87d60b45493985ee0c842179fd66174a556f4fe`)
+            fetch(`https://api.waqi.info/feed/geo:${lat};${lon}/?token=${airQualityApiKey}`),
+            fetch(`https://api.lightpollutionmap.info/radiance/${lat},${lon}`) // Replace with actual endpoint if needed
         ]);
 
         const weatherData = await weatherResponse.json();
         const aqiData = await aqiResponse.json();
+        const lightPollutionData = await lightPollutionResponse.json();
 
         const windSpeed = weatherData.wind.speed; // in m/s
         const aqi = aqiData.data.aqi; // Air Quality Index
+        const lightPollution = lightPollutionData.radiance || "N/A"; // Adjust based on the API's response structure
 
-        return { windSpeed, aqi };
+        return { windSpeed, aqi, lightPollution };
     } catch (error) {
         console.error('Error fetching data:', error);
-        return { windSpeed: null, aqi: null };
+        return { windSpeed: null, aqi: null, lightPollution: null };
     }
 }
 
@@ -47,15 +50,15 @@ stargazingSpots.forEach(async spot => {
     const marker = L.marker(spot.coords).addTo(map);
 
     // Fetch dynamic data
-    const { windSpeed, aqi } = await fetchWeatherAndAQI(spot.coords[0], spot.coords[1]);
+    const { windSpeed, aqi, lightPollution } = await fetchWeatherAQILight(spot.coords[0], spot.coords[1]);
 
     // Determine suitability for stargazing
     let suitability = "Insufficient Data";
-    if (windSpeed !== null && aqi !== null) {
-        if (windSpeed < 8 && aqi < 90) {
+    if (windSpeed !== null && aqi !== null && lightPollution !== null) {
+        if (windSpeed < 8 && aqi < 90 && lightPollution < 1) { // Adjust light pollution threshold as needed
             suitability = "Suitable for Stargazing! 🌌";
         } else {
-            suitability = "Not Suitable for Stargazing.🚫";
+            suitability = "Not Suitable for Stargazing. 🚫";
         }
     }
 
@@ -64,6 +67,8 @@ stargazingSpots.forEach(async spot => {
         <b>${spot.name}</b><br>
         Wind Speed: ${windSpeed !== null ? `${windSpeed} m/s` : "N/A"}<br>
         AQI: ${aqi !== null ? aqi : "N/A"}<br>
+        Light Pollution: ${lightPollution !== null ? lightPollution : "N/A"}<br>
         ${suitability}
     `);
 });
+
