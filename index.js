@@ -1,9 +1,9 @@
 // Initialize the map
 const map = L.map('map').setView([20.5937, 78.9629], 5); // Center on India
 
-// Add the light pollution tile layer
-L.tileLayer("https://tiles.lightpollutionmap.info/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://lightpollutionmap.info/">LightPollutionMap</a>',
+// Add tile layer for the map
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '© OpenStreetMap contributors',
     maxZoom: 18
 }).addTo(map);
 
@@ -19,29 +19,36 @@ const stargazingSpots = [
     { name: "Coorg", coords: [12.3375, 75.8069] }
 ];
 
-// Function to fetch weather and AQI data
+// Function to fetch weather, AQI, and light pollution data
 async function fetchDetails(lat, lon) {
     const weatherApiKey = 'c2c07ed68408e1730b71769f8740c726'; // Replace with your OpenWeatherMap API key
     const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
+
     try {
         // Fetch weather and AQI data
         const [weatherResponse, aqiResponse] = await Promise.all([
-            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}`),
-            fetch(`https://api.waqi.info/feed/here/?token=${airQualityApiKey}`)
+            fetch(https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}),
+            fetch(https://api.waqi.info/feed/here/?token=${airQualityApiKey})
         ]);
 
         const weatherData = await weatherResponse.json();
         const aqiData = await aqiResponse.json();
 
-        const windSpeed = weatherData.wind.speed; // Wind speed in m/s
-        const aqi = aqiData.data.aqi; // Air Quality Index
+        // Log API responses to check the structure
+        console.log("Weather Data:", weatherData);
+        console.log("AQI Data:", aqiData);
+
+        const windSpeed = weatherData.wind ? weatherData.wind.speed : null; // Wind speed in m/s
+        const aqi = aqiData.data ? aqiData.data.aqi : null; // Air Quality Index
 
         // Determine suitability for stargazing based on wind speed and AQI
         let suitability = "Insufficient Data";
-        if (windSpeed < 8 && aqi < 90) {
-            suitability = "Suitable for Stargazing! 🌌";
-        } else {
-            suitability = "Not Suitable for Stargazing.🚫";
+        if (windSpeed !== null && aqi !== null) {
+            if (windSpeed < 8 && aqi < 90) {
+                suitability = "Suitable for Stargazing! 🌌";
+            } else {
+                suitability = "Not Suitable for Stargazing.🚫";
+            }
         }
 
         // Return all the fetched details
@@ -53,21 +60,23 @@ async function fetchDetails(lat, lon) {
 }
 
 // Add markers for each spot and fetch dynamic data
-stargazingSpots.forEach(async spot => {
+stargazingSpots.forEach(async (spot) => {
     const marker = L.marker(spot.coords).addTo(map);
 
-    // Fetch dynamic data (weather, AQI)
+    // Fetch dynamic data (weather, AQI, suitability)
     const { windSpeed, aqi, suitability } = await fetchDetails(spot.coords[0], spot.coords[1]);
+
+    // Log the data being used in the popup
+    console.log(Data for ${spot.name}: Wind Speed - ${windSpeed}, AQI - ${aqi}, Suitability - ${suitability});
 
     // Add a detailed popup with all the fetched data
     marker.bindPopup(`
         <b>${spot.name}</b><br>
-        Wind Speed: ${windSpeed !== null ? `${windSpeed} m/s` : "N/A"}<br>
+        Wind Speed: ${windSpeed !== null ? ${windSpeed} m/s : "N/A"}<br>
         AQI: ${aqi !== null ? aqi : "N/A"}<br>
         ${suitability}
     `);
 });
-
 
 
 
