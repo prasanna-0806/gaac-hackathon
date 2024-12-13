@@ -19,7 +19,7 @@ const stargazingSpots = [
     { name: "Coorg", coords: [12.3375, 75.8069] }
 ];
 
-// Function to fetch weather, AQI, and light pollution data
+// Function to fetch weather and AQI data
 async function fetchDetails(lat, lon) {
     const weatherApiKey = 'c2c07ed68408e1730b71769f8740c726'; // Replace with your OpenWeatherMap API key
     const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
@@ -67,6 +67,7 @@ stargazingSpots.forEach(async spot => {
         ${suitability}
     `);
 });
+
 
 
 
