@@ -31,22 +31,24 @@ async function fetchDetails(lat, lon) {
             fetch(`https://api.waqi.info/feed/here/?token=${airQualityApiKey}`)
         ]);
 
-        // Log API responses to verify data
-        console.log("Weather Response:", await weatherResponse.json());
-        console.log("AQI Response:", await aqiResponse.json());
-
         const weatherData = await weatherResponse.json();
         const aqiData = await aqiResponse.json();
 
-        const windSpeed = weatherData.wind.speed; // Wind speed in m/s
-        const aqi = aqiData.data.aqi; // Air Quality Index
+        // Log API responses to check the structure
+        console.log("Weather Data:", weatherData);
+        console.log("AQI Data:", aqiData);
+
+        const windSpeed = weatherData.wind ? weatherData.wind.speed : null; // Wind speed in m/s
+        const aqi = aqiData.data ? aqiData.data.aqi : null; // Air Quality Index
 
         // Determine suitability for stargazing based on wind speed and AQI
         let suitability = "Insufficient Data";
-        if (windSpeed < 8 && aqi < 90) {
-            suitability = "Suitable for Stargazing! 🌌";
-        } else {
-            suitability = "Not Suitable for Stargazing.🚫";
+        if (windSpeed !== null && aqi !== null) {
+            if (windSpeed < 8 && aqi < 90) {
+                suitability = "Suitable for Stargazing! 🌌";
+            } else {
+                suitability = "Not Suitable for Stargazing.🚫";
+            }
         }
 
         // Return all the fetched details
@@ -64,8 +66,8 @@ stargazingSpots.forEach(async (spot) => {
     // Fetch dynamic data (weather, AQI, suitability)
     const { windSpeed, aqi, suitability } = await fetchDetails(spot.coords[0], spot.coords[1]);
 
-    // Log the data to verify it's being fetched
-    console.log(`Data for ${spot.name}:`, windSpeed, aqi, suitability);
+    // Log the data being used in the popup
+    console.log(`Data for ${spot.name}: Wind Speed - ${windSpeed}, AQI - ${aqi}, Suitability - ${suitability}`);
 
     // Add a detailed popup with all the fetched data
     marker.bindPopup(`
