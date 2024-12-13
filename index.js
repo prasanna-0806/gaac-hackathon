@@ -1,9 +1,9 @@
 // Initialize the map
 const map = L.map('map').setView([20.5937, 78.9629], 5); // Center on India
 
-// Add tile layer
+// Add tile layer for the map
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    attribution: '© OpenStreetMap contributors',
     maxZoom: 18
 }).addTo(map);
 
@@ -23,7 +23,6 @@ const stargazingSpots = [
 async function fetchDetails(lat, lon) {
     const weatherApiKey = 'c2c07ed68408e1730b71769f8740c726'; // Replace with your OpenWeatherMap API key
     const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
-    const lightPollutionApiUrl = 'https://tiles.lightpollutionmap.info/{z}/{x}/{y}.png'; // Light pollution API tile URL
 
     try {
         // Fetch weather and AQI data
@@ -31,7 +30,7 @@ async function fetchDetails(lat, lon) {
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}`),
             fetch(`https://api.waqi.info/feed/here/?token=${airQualityApiKey}`)
         ]);
-
+        
         const weatherData = await weatherResponse.json();
         const aqiData = await aqiResponse.json();
 
@@ -55,10 +54,10 @@ async function fetchDetails(lat, lon) {
 }
 
 // Add markers for each spot and fetch dynamic data
-stargazingSpots.forEach(async spot => {
+stargazingSpots.forEach(async (spot) => {
     const marker = L.marker(spot.coords).addTo(map);
 
-    // Fetch dynamic data (weather, AQI, light pollution)
+    // Fetch dynamic data (weather, AQI, suitability)
     const { windSpeed, aqi, suitability } = await fetchDetails(spot.coords[0], spot.coords[1]);
 
     // Add a detailed popup with all the fetched data
@@ -69,6 +68,7 @@ stargazingSpots.forEach(async spot => {
         ${suitability}
     `);
 });
+
 
 
 
