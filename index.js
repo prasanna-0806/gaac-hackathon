@@ -84,4 +84,3 @@ stargazingSpots.forEach(async (spot) => {
 
 
 
-
