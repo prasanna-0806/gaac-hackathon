@@ -30,7 +30,11 @@ async function fetchDetails(lat, lon) {
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}`),
             fetch(`https://api.waqi.info/feed/here/?token=${airQualityApiKey}`)
         ]);
-        
+
+        // Log API responses to verify data
+        console.log("Weather Response:", await weatherResponse.json());
+        console.log("AQI Response:", await aqiResponse.json());
+
         const weatherData = await weatherResponse.json();
         const aqiData = await aqiResponse.json();
 
@@ -59,6 +63,9 @@ stargazingSpots.forEach(async (spot) => {
 
     // Fetch dynamic data (weather, AQI, suitability)
     const { windSpeed, aqi, suitability } = await fetchDetails(spot.coords[0], spot.coords[1]);
+
+    // Log the data to verify it's being fetched
+    console.log(`Data for ${spot.name}:`, windSpeed, aqi, suitability);
 
     // Add a detailed popup with all the fetched data
     marker.bindPopup(`
