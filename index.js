@@ -21,7 +21,7 @@ const stargazingSpots = [
 
 // Function to fetch weather, AQI, and light pollution data
 async function fetchDetails(lat, lon) {
-    const weatherApiKey = 'c2c07ed68408e1730b71769f8740c726'; // Replace with your OpenWeatherMap API key
+    const weatherApiKey = 'e943ba1a3f38663ee66ba362f50a008a'; // Replace with your OpenWeatherMap API key
     const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
 
     try {
