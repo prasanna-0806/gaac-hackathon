@@ -1,9 +1,10 @@
 // Initialize the map
 const map = L.map('map').setView([20.5937, 78.9629], 5); // Center on India
 
+// Add a tile layer for Light Pollution data
 L.tileLayer("https://tiles.lightpollutionmap.info/{z}/{x}/{y}.png", {
-  attribution: '&copy; <a href="https://lightpollutionmap.info/">LightPollutionMap</a>',
-  maxZoom: 18,
+    attribution: '&copy; <a href="https://lightpollutionmap.info/">LightPollutionMap</a>',
+    maxZoom: 18
 }).addTo(map);
 
 // List of stargazing spots
@@ -18,44 +19,57 @@ const stargazingSpots = [
     { name: "Coorg", coords: [12.3375, 75.8069] }
 ];
 
-// Function to fetch weather, AQI, and light pollution data
-async function fetchWeatherAQILight(lat, lon) {
+// Function to fetch weather and AQI data
+async function fetchWeatherAndAQI(lat, lon) {
     const weatherApiKey = 'c2c07ed68408e1730b71769f8740c726'; // Replace with your API key
     const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your API key
 
     try {
-        const [weatherResponse, aqiResponse, lightPollutionResponse] = await Promise.all([
+        const [weatherResponse, aqiResponse] = await Promise.all([
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}`),
-            fetch(`https://api.waqi.info/feed/geo:${lat};${lon}/?token=${airQualityApiKey}`),
-            fetch(`https://api.lightpollutionmap.info/radiance/${lat},${lon}`) // Replace with actual endpoint if needed
+            fetch(`https://api.waqi.info/feed/here/?token=a87d60b45493985ee0c842179fd66174a556f4fe`)
         ]);
 
         const weatherData = await weatherResponse.json();
         const aqiData = await aqiResponse.json();
-        const lightPollutionData = await lightPollutionResponse.json();
 
         const windSpeed = weatherData.wind.speed; // in m/s
         const aqi = aqiData.data.aqi; // Air Quality Index
-        const lightPollution = lightPollutionData.radiance || "N/A"; // Adjust based on the API's response structure
 
-        return { windSpeed, aqi, lightPollution };
+        return { windSpeed, aqi };
     } catch (error) {
         console.error('Error fetching data:', error);
-        return { windSpeed: null, aqi: null, lightPollution: null };
+        return { windSpeed: null, aqi: null };
     }
 }
 
-// Add markers for each spot
-stargazingSpots.forEach(async spot => {
+// Function to fetch Light Pollution data
+async function fetchLightPollutionData(lat, lon) {
+    const lightPollutionApiUrl = `https://api.lightpollutionmap.info/xyz/${lat}/${lon}`; // Replace with actual API endpoint if available
+
+    try {
+        const response = await fetch(lightPollutionApiUrl);
+        const data = await response.json();
+        const lightPollution = data.value; // This assumes the response includes a `value` field
+        return lightPollution;
+    } catch (error) {
+        console.error('Error fetching light pollution data:', error);
+        return null;
+    }
+}
+
+// Add markers for each stargazing spot
+stargazingSpots.forEach(async (spot) => {
     const marker = L.marker(spot.coords).addTo(map);
 
     // Fetch dynamic data
-    const { windSpeed, aqi, lightPollution } = await fetchWeatherAQILight(spot.coords[0], spot.coords[1]);
+    const { windSpeed, aqi } = await fetchWeatherAndAQI(spot.coords[0], spot.coords[1]);
+    const lightPollution = await fetchLightPollutionData(spot.coords[0], spot.coords[1]);
 
     // Determine suitability for stargazing
     let suitability = "Insufficient Data";
     if (windSpeed !== null && aqi !== null && lightPollution !== null) {
-        if (windSpeed < 8 && aqi < 90 && lightPollution < 1) { // Adjust light pollution threshold as needed
+        if (windSpeed < 8 && aqi < 90 && lightPollution < 2) {
             suitability = "Suitable for Stargazing! 🌌";
         } else {
             suitability = "Not Suitable for Stargazing. 🚫";
@@ -67,8 +81,9 @@ stargazingSpots.forEach(async spot => {
         <b>${spot.name}</b><br>
         Wind Speed: ${windSpeed !== null ? `${windSpeed} m/s` : "N/A"}<br>
         AQI: ${aqi !== null ? aqi : "N/A"}<br>
-        Light Pollution: ${lightPollution !== null ? lightPollution : "N/A"}<br>
+        Light Pollution: ${lightPollution !== null ? `${lightPollution} (Low)` : "N/A"}<br>
         ${suitability}
     `);
 });
+
 
