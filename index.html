@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stargazing Locations and Light Pollution Map</title>
+    <!-- Link to Google Fonts for Garamond font -->
+    <link href="https://fonts.googleapis.com/css2?family=Garamond&display=swap" rel="stylesheet">
+    <!-- Link to Google Fonts for Roboto font (for body text) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <!-- Leaflet CSS and JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-tilelayer-light-pollution/dist/leaflet-tilelayer-light-pollution.js"></script>
 </head>
-
 <body>
-    <!-- Navigation bar with headers -->
+    <!-- Header with navigation -->
+    <header>
+        <h1>Stargazing Locations</h1>
+        <p>Explore the best places to stargaze and check the light pollution levels.</p>
+    </header>
+
+    <!-- Navigation Bar -->
     <nav>
         <ul>
             <li><a href="https://draghupa3.wixsite.com/dark-sky-finder">Home</a></li>
@@ -22,32 +30,56 @@
         </ul>
     </nav>
 
-    <header>
-        <h1>Explore Stargazing Locations in India</h1>
-        <p>Discover the best stargazing spots with real-time data on weather, air quality, and light pollution</p>
-    </header>
+    <!-- Map Section -->
+    <section id="map"></section>
 
-    <section id="stargazing-intro">
-        <h2>What is Stargazing?</h2>
-        <p>Stargazing refers to the activity of observing stars and other celestial objects. Some places are ideal for stargazing due to low light pollution and favorable weather conditions.</p>
-    </section>
-
-    <section id="map-container">
-        <h2>Interactive Stargazing Map</h2>
-        <div id="map"></div>
-        <p>Click on a marker to view the windspeed, air quality, and light pollution data for the stargazing location.</p>
-    </section>
-
-    <section id="how-it-works">
-        <h2>How This Works</h2>
-        <p>Our map uses real-time data from weather APIs to show you the windspeed, air quality, and light pollution of various stargazing locations in India. It helps you decide the best spot for stargazing based on current conditions.</p>
-    </section>
-
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2024 Stargazing India. All rights reserved.</p>
+        <p>&copy; 2024 Stargazing Locations | All rights reserved</p>
     </footer>
 
-    <script src="script.js"></script>
-</body>
+    <script>
+        // Initializing the map
+        var map = L.map('map').setView([20.5937, 78.9629], 5); // Centering on India
 
+        // Adding the light pollution layer
+        L.tileLayer.lightPollution("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+        // Adding markers for stargazing spots
+        const stargazingSpots = [
+            { name: "Horsley Hills", coords: [13.6601, 78.3992] },
+            { name: "Rann of Kutch", coords: [23.7333, 70.8007] },
+            { name: "Ladakh", coords: [34.1526, 77.5770] },
+            { name: "Spiti Valley", coords: [32.2464, 78.0172] },
+            { name: "Mahabaleshwar", coords: [17.9235, 73.6586] },
+            { name: "Savandurga Hills", coords: [12.9192, 77.2920] },
+            { name: "Nandi Hills", coords: [13.3702, 77.6835] },
+            { name: "Coorg", coords: [12.3375, 75.8069] },
+            { name: "Auli", coords: [30.0691, 79.5363] },
+            { name: "Mount Abu", coords: [24.5854, 72.7103] },
+            { name: "Tawang", coords: [27.5542, 91.8594] },
+            { name: "Munsiyari", coords: [30.0650, 80.0602] },
+            { name: "Tirunelveli", coords: [8.7342, 77.7197] },
+            { name: "Kanha National Park", coords: [22.2447, 80.6680] },
+            { name: "Chopta", coords: [30.2042, 79.2714] },
+            { name: "Darjeeling", coords: [27.0350, 88.2636] },
+            { name: "Ziro Valley", coords: [27.5815, 93.8260] },
+            { name: "Lonavala", coords: [18.7500, 73.4092] },
+            { name: "Kumarakom", coords: [9.6007, 76.5156] },
+            { name: "Gulmarg", coords: [34.0510, 74.3738] },
+            { name: "Sundarbans", coords: [22.0800, 88.7950] },
+            { name: "Jaisalmer", coords: [26.9157, 70.9223] },
+            { name: "Rishikesh", coords: [30.1236, 78.3171] }
+        ];
+
+        // Loop through the stargazing spots and add markers
+        stargazingSpots.forEach(spot => {
+            const marker = L.marker(spot.coords).addTo(map);
+            marker.bindPopup(`
+                <strong>${spot.name}</strong><br>
+                <button onclick="window.open('https://www.google.com/search?q=${spot.name}', '_blank')">Search on Google</button>
+            `);
+        });
+    </script>
+</body>
 </html>
