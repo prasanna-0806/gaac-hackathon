@@ -4,86 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stargazing Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         #map {
-            height: 600px;
+            height: 100vh;
             width: 100%;
         }
     </style>
 </head>
 <body>
+    <h1>Dark Sky Finder</h1>
     <div id="map"></div>
-
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        // Initialize the map
-        const map = L.map('map').setView([20.5937, 78.9629], 5);
-
-        // Add OpenStreetMap layer
-        const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 18
-        }).addTo(map);
-
-        // Add Light Pollution layer (replace with valid URL if needed)
-        const lightPollutionLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '© OpenStreetMap contributors | Light Pollution Map',
-            maxZoom: 18,
-            opacity: 0.6
-        });
-
-        // Stargazing locations (just a few as an example)
-        const stargazingSpots = [
-            { name: "Horsley Hills", coords: [13.6601, 78.3992] },
-            { name: "Rann of Kutch", coords: [23.7333, 70.8007] }
-        ];
-
-        // Fetching weather and AQI data (example)
-        async function fetchWeatherData(lat, lon) {
-            // Replace with valid API URLs
-            const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=YOUR_API_KEY`;
-            const aqiURL = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=YOUR_API_KEY`;
-
-            try {
-                const weatherResponse = await fetch(weatherURL);
-                const weatherData = await weatherResponse.json();
-                const aqiResponse = await fetch(aqiURL);
-                const aqiData = await aqiResponse.json();
-                return { windspeed: weatherData.wind.speed, aqi: aqiData.data.aqi };
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                return { windspeed: "N/A", aqi: "N/A" };
-            }
-        }
-
-        // Add markers with popups for stargazing locations
-        async function addMarkers() {
-            for (const location of stargazingSpots) {
-                const { name, coords } = location;
-                const [lat, lon] = coords;
-                const { windspeed, aqi } = await fetchWeatherData(lat, lon);
-
-                const marker = L.marker(coords).addTo(map);
-                const suitability = (aqi < 100 && windspeed < 20) ? 'Suitable for Stargazing' : 'Not Suitable for Stargazing';
-                const popupContent = `
-                    <h3>${name}</h3>
-                    <p>Windspeed: ${windspeed} m/s</p>
-                    <p>AQI: ${aqi}</p>
-                    <p>Stargazing Suitability: ${suitability}</p>
-                `;
-                marker.bindPopup(popupContent);
-            }
-        }
-
-        // Add layers control
-        L.control.layers({
-            "OpenStreetMap": baseLayer,
-            "Light Pollution": lightPollutionLayer
-        }).addTo(map);
-
-        lightPollutionLayer.addTo(map); // Add light pollution layer by default
-        addMarkers(); // Add markers and popups
-    </script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
