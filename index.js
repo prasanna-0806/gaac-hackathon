@@ -1,11 +1,19 @@
 // Initialize the map
 const map = L.map('map').setView([20.5937, 78.9629], 5); // Center on India
 
-// Add tile layer for the map
+// Add tile layer for the map (OpenStreetMap)
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 18
 }).addTo(map);
+
+// Add the Light Pollution Tile Layer
+const lightPollutionTileLayer = L.tileLayer(
+    'https://darksky.darksitefinder.com/tiles/{z}/{x}/{y}.png', {
+        attribution: 'Light Pollution Data © 2021 Dark Site Finder',
+        maxZoom: 8,
+        minZoom: 3
+    }).addTo(map);
 
 // List of stargazing spots with coordinates
 const stargazingSpots = [
