@@ -7,24 +7,36 @@ const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.pn
     maxZoom: 18
 }).addTo(map);
 
-// Add the Light Pollution Map tile layer (replace with correct URL)
-const lightPollutionLayer = L.tileLayer("https://www.lightpollutionmap.info/#zoom=4.43&lat=31.8074&lon=80.2820&state=eyJiYXNlbWFwIjoiTGF5ZXJCaW5nUm9hZCIsIm92ZXJsYXkiOiJ3YV8yMDE1Iiwib3ZlcmxheWNvbG9yIjpmYWxzZSwib3ZlcmxheW9wYWNpdHkiOjYwLCJmZWF0dXJlc29wYWNpdHkiOjg1fQ==", {
-    attribution: '© OpenStreetMap contributors | Light Pollution Map',
-    maxZoom: 18,
-    opacity: 0.6 // Adjust opacity to blend with other layers
-});
-
 // List of famous stargazing locations with coordinates
 const stargazingSpots = [
     { name: "Horsley Hills", coords: [13.6601, 78.3992] },
     { name: "Rann of Kutch", coords: [23.7333, 70.8007] },
     { name: "Ladakh", coords: [34.1526, 77.5770] },
-    // Add more spots as needed
+    { name: "Spiti Valley", coords: [32.2464, 78.0172] },
+    { name: "Mahabaleshwar", coords: [17.9235, 73.6586] },
+    { name: "Savandurga Hills", coords: [12.9192, 77.2920] },
+    { name: "Nandi Hills", coords: [13.3702, 77.6835] },
+    { name: "Coorg", coords: [12.3375, 75.8069] },
+    { name: "Auli", coords: [30.0691, 79.5363] },
+    { name: "Mount Abu", coords: [24.5854, 72.7103] },
+    { name: "Tawang", coords: [27.5542, 91.8594] },
+    { name: "Munsiyari", coords: [30.0650, 80.0602] },
+    { name: "Tirunelveli", coords: [8.7342, 77.7197] },
+    { name: "Kanha National Park", coords: [22.2447, 80.6680] },
+    { name: "Chopta", coords: [30.2042, 79.2714] },
+    { name: "Darjeeling", coords: [27.0350, 88.2636] },
+    { name: "Ziro Valley", coords: [27.5815, 93.8260] },
+    { name: "Lonavala", coords: [18.7500, 73.4092] },
+    { name: "Kumarakom", coords: [9.6007, 76.5156] },
+    { name: "Gulmarg", coords: [34.0510, 74.3738] },
+    { name: "Sundarbans", coords: [22.0800, 88.7950] },
+    { name: "Jaisalmer", coords: [26.9157, 70.9223] },
+    { name: "Rishikesh", coords: [30.1236, 78.3171] }
 ];
 
 // OpenWeatherMap API key
-const weatherApiKey = 'e943ba1a3f38663ee66ba362f50a008a'; // Replace with your OpenWeatherMap API key
-const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
+const weatherApiKey = 'YOUR_WEATHER_API_KEY'; // Replace with your OpenWeatherMap API key
+const airQualityApiKey = 'YOUR_AQI_API_KEY'; // Replace with your AQI API key
 
 // Function to fetch windspeed and AQI data from APIs
 async function fetchWeatherData(lat, lon) {
@@ -57,9 +69,6 @@ async function addMarkers() {
 
         // Fetch weather and AQI data
         const { windspeed, aqi } = await fetchWeatherData(lat, lon);
-        
-        // Logging the location for debugging
-        console.log("Adding marker for:", name);
 
         // Create marker for the location
         const marker = L.marker(coords).addTo(map);
@@ -78,15 +87,6 @@ async function addMarkers() {
         marker.bindPopup(popupContent);
     }
 }
-
-// Add the layer control to toggle between layers
-L.control.layers({
-    "OpenStreetMap": baseLayer,
-    "Light Pollution": lightPollutionLayer
-}).addTo(map);
-
-// Add the Light Pollution layer by default
-lightPollutionLayer.addTo(map);
 
 // Add markers and popups to the map
 addMarkers();
