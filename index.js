@@ -1,21 +1,20 @@
-// Initialize the map
-const map = L.map('map').setView([20.5937, 78.9629], 5); // Center on India
+// Initialize the map centered on India (default zoom level)
+const map = L.map('map').setView([20.5937, 78.9629], 5);
 
-// Add tile layer for the map (OpenStreetMap)
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+// Add the base OpenStreetMap tile layer
+const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 18
 }).addTo(map);
 
-// Add the Light Pollution Tile Layer (Dark Site Finder)
-const lightPollutionTileLayer = L.tileLayer(
-    'https://darksky.darksitefinder.com/tiles/{z}/{x}/{y}.png', {
-        attribution: 'Light Pollution Data © 2021 Dark Site Finder',
-        maxZoom: 8,
-        minZoom: 3
-    }).addTo(map);
+// Add the Light Pollution Map tile layer (replace with correct URL)
+const lightPollutionLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '© OpenStreetMap contributors | Light Pollution Map',
+    maxZoom: 18,
+    opacity: 0.6 // Adjust opacity to blend with other layers
+});
 
-// List of stargazing spots with coordinates
+// List of famous stargazing locations with coordinates
 const stargazingSpots = [
     { name: "Horsley Hills", coords: [13.6601, 78.3992] },
     { name: "Rann of Kutch", coords: [23.7333, 70.8007] },
@@ -42,56 +41,68 @@ const stargazingSpots = [
     { name: "Rishikesh", coords: [30.1236, 78.3171] } // Rishikesh in Uttarakhand
 ];
 
-// Function to fetch weather, AQI data
-async function fetchDetails(lat, lon) {
-    const weatherApiKey = 'e943ba1a3f38663ee66ba362f50a008a'; // Replace with your OpenWeatherMap API key
-    const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
+// OpenWeatherMap API key
+const weatherApiKey = 'e943ba1a3f38663ee66ba362f50a008a'; // Replace with your OpenWeatherMap API key
+const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
+
+// Function to fetch windspeed and AQI data from APIs
+async function fetchWeatherData(lat, lon) {
+    const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherAPIKey}`;
+    const aqiURL = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${aqiAPIKey}`;
 
     try {
-        // Fetch weather and AQI data
-        const [weatherResponse, aqiResponse] = await Promise.all([
-            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}`),
-            fetch(`https://api.waqi.info/feed/geo:${lat};${lon}/?token=${airQualityApiKey}`)
-        ]);
-
+        // Fetching windspeed from OpenWeatherMap API
+        const weatherResponse = await fetch(weatherURL);
         const weatherData = await weatherResponse.json();
+        const windspeed = weatherData.wind.speed; // wind speed in m/s
+
+        // Fetching AQI data from World Air Quality Index API
+        const aqiResponse = await fetch(aqiURL);
         const aqiData = await aqiResponse.json();
+        const aqi = aqiData.data.aqi; // AQI value
 
-        const windSpeed = weatherData.wind ? weatherData.wind.speed : null; // Wind speed in m/s
-        const aqi = aqiData.data ? aqiData.data.aqi : null; // Air Quality Index
-
-        return { windSpeed, aqi };
+        return { windspeed, aqi };
     } catch (error) {
-        console.error('Error fetching data:', error);
-        return { windSpeed: null, aqi: null };
+        console.error("Error fetching weather or AQI data:", error);
+        return { windspeed: "N/A", aqi: "N/A" };
     }
 }
 
-// Function to determine stargazing suitability
-function isSuitableForStargazing(windSpeed, aqi) {
-    if (windSpeed < 8 && aqi < 90) {
-        return "Suitable for Stargazing! 🌌";
-    } else {
-        return "Not Suitable for Stargazing 🚫";
+// Function to create markers and popups for each location
+async function addMarkers() {
+    for (const location of stargazingSpots) {
+        const { name, coords } = location;
+        const [lat, lon] = coords;
+
+        // Fetch weather and AQI data
+        const { windspeed, aqi } = await fetchWeatherData(lat, lon);
+
+        // Create marker for the location
+        const marker = L.marker(coords).addTo(map);
+
+        // Create a popup with windspeed, AQI, and suitability message
+        const suitability = (aqi < 100 && windspeed < 20) ? 'Suitable for Stargazing' : 'Not Suitable for Stargazing';
+        const popupContent = `
+            <h3>${name}</h3>
+            <p>Windspeed: ${windspeed} m/s</p>
+            <p>AQI: ${aqi}</p>
+            <p>Stargazing Suitability: ${suitability}</p>
+            <button onclick="window.open('https://www.google.com/maps/search/?q=${name}')">Search on Google</button>
+        `;
+
+        // Bind popup to the marker
+        marker.bindPopup(popupContent);
     }
 }
 
-// Add markers for each spot and fetch dynamic data
-stargazingSpots.forEach(async (spot) => {
-    // Fetch weather and AQI data
-    const { windSpeed, aqi } = await fetchDetails(spot.coords[0], spot.coords[1]);
+// Add the layer control to toggle between layers
+L.control.layers({
+    "OpenStreetMap": baseLayer,
+    "Light Pollution": lightPollutionLayer
+}).addTo(map);
 
-    // Determine stargazing suitability
-    const suitability = isSuitableForStargazing(windSpeed, aqi);
+// Add the Light Pollution layer by default
+lightPollutionLayer.addTo(map);
 
-    // Marker for each stargazing spot
-    const marker = L.marker(spot.coords).addTo(map);
-
-    // Bind a popup to the marker
-    marker.bindPopup(`
-        <b>${spot.name}</b><br>
-        Wind Speed: ${windSpeed !== null ? `${windSpeed} m/s` : "N/A"}<br>
-        AQI: ${aqi !== null ? aqi : "N/A"}<br>
-        Suitability for Stargazing: ${suitability}
-    `);
-});
+// Add markers and popups to the map
+addMarkers();
