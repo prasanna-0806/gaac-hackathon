@@ -1,25 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stargazing Map</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        #map {
-            height: 100vh;
-            width: 100%;
-        }
-    </style>
+    <title>Stargazing Locations and Light Pollution Map</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-tilelayer-light-pollution/dist/leaflet-tilelayer-light-pollution.js"></script>
 </head>
+
 <body>
-    <h1>Dark Sky Finder</h1>
-    <div id="map"></div>
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="index.js"></script>
+    <!-- Navigation bar with headers -->
+    <nav>
+        <ul>
+            <li><a href="https://draghupa3.wixsite.com/dark-sky-finder">Home</a></li>
+            <li><a href="https://draghupa3.wixsite.com/dark-sky-finder/stargazing-guide">Guide</a></li>
+            <li><a href="https://draghupa3.wixsite.com/dark-sky-finder/about-us">About Us</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>Explore Stargazing Locations in India</h1>
+        <p>Discover the best stargazing spots with real-time data on weather, air quality, and light pollution</p>
+    </header>
+
+    <section id="stargazing-intro">
+        <h2>What is Stargazing?</h2>
+        <p>Stargazing refers to the activity of observing stars and other celestial objects. Some places are ideal for stargazing due to low light pollution and favorable weather conditions.</p>
+    </section>
+
+    <section id="map-container">
+        <h2>Interactive Stargazing Map</h2>
+        <div id="map"></div>
+        <p>Click on a marker to view the windspeed, air quality, and light pollution data for the stargazing location.</p>
+    </section>
+
+    <section id="how-it-works">
+        <h2>How This Works</h2>
+        <p>Our map uses real-time data from weather APIs to show you the windspeed, air quality, and light pollution of various stargazing locations in India. It helps you decide the best spot for stargazing based on current conditions.</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Stargazing India. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
+
 </html>
-
-
