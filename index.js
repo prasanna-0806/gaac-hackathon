@@ -40,13 +40,13 @@ const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace 
 
 // Function to categorize AQI into pollution levels
 function getPollutionLevel(aqi) {
-    if (aqi <= 50) {
+    if (aqi <= 90) {
         return { level: "Good", color: "green" };
-    } else if (aqi <= 100) {
+    } else if (aqi <= 130) {
         return { level: "Moderate", color: "yellow" };
-    } else if (aqi <= 150) {
+    } else if (aqi <= 180) {
         return { level: "Unhealthy for Sensitive Groups", color: "orange" };
-    } else if (aqi <= 200) {
+    } else if (aqi <= 240) {
         return { level: "Unhealthy", color: "red" };
     } else if (aqi <= 300) {
         return { level: "Very Unhealthy", color: "purple" };
@@ -104,9 +104,9 @@ async function addMarkers() {
         const popupContent = `
             <h3>${name}</h3>
             <p>Windspeed: ${windspeed} m/s</p>
-            <p>AQI: ${aqi} - <span style="color:${color};">${level}</span></p>
+            <p>AQI: ${aqi}</p>
             <p>Stargazing Suitability: ${suitability}</p>
-            <p>Light Pollution: ${level}</p>
+            <p>Light Pollution: ${level} - <span style="color:${color};">${level}</span></p>
             <button onclick="window.open('https://www.google.com/maps/search/?q=${name}')">Search on Google</button>
         `;
 
