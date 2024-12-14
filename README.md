@@ -2,7 +2,7 @@
 
 - Dil Barash Mohammed
 
-  Linekdin- www.linkedin.com/in/dilbarash
+  Linkedin- www.linkedin.com/in/dilbarash
 
   Github- https://github.com/dilbarash
   
