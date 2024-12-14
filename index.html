@@ -3,83 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stargazing Locations and Light Pollution Map</title>
-    <!-- Link to Google Fonts for Garamond font -->
-    <link href="https://fonts.googleapis.com/css2?family=Garamond&display=swap" rel="stylesheet">
-    <!-- Link to Google Fonts for Roboto font (for body text) -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <!-- Leaflet CSS and JS -->
+    <title>Stargazing Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-tilelayer-light-pollution/dist/leaflet-tilelayer-light-pollution.js"></script>
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header with navigation -->
-    <header>
-        <h1>Stargazing Locations</h1>
-        <p>Explore the best places to stargaze and check the light pollution levels.</p>
-    </header>
+    <div id="map"></div>
 
-    <!-- Navigation Bar -->
-    <nav>
-        <ul>
-            <li><a href="https://draghupa3.wixsite.com/dark-sky-finder">Home</a></li>
-            <li><a href="https://draghupa3.wixsite.com/dark-sky-finder/stargazing-guide">Guide</a></li>
-            <li><a href="https://draghupa3.wixsite.com/dark-sky-finder/about-us">About Us</a></li>
-        </ul>
-    </nav>
-
-    <!-- Map Section -->
-    <section id="map"></section>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 Stargazing Locations | All rights reserved</p>
-    </footer>
-
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        // Initializing the map
-        var map = L.map('map').setView([20.5937, 78.9629], 5); // Centering on India
+        // Initialize the map
+        const map = L.map('map').setView([20.5937, 78.9629], 5);
 
-        // Adding the light pollution layer
-        L.tileLayer.lightPollution("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+        // Add OpenStreetMap layer
+        const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
 
-        // Adding markers for stargazing spots
+        // Add Light Pollution layer (replace with valid URL if needed)
+        const lightPollutionLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '© OpenStreetMap contributors | Light Pollution Map',
+            maxZoom: 18,
+            opacity: 0.6
+        });
+
+        // Stargazing locations (just a few as an example)
         const stargazingSpots = [
             { name: "Horsley Hills", coords: [13.6601, 78.3992] },
-            { name: "Rann of Kutch", coords: [23.7333, 70.8007] },
-            { name: "Ladakh", coords: [34.1526, 77.5770] },
-            { name: "Spiti Valley", coords: [32.2464, 78.0172] },
-            { name: "Mahabaleshwar", coords: [17.9235, 73.6586] },
-            { name: "Savandurga Hills", coords: [12.9192, 77.2920] },
-            { name: "Nandi Hills", coords: [13.3702, 77.6835] },
-            { name: "Coorg", coords: [12.3375, 75.8069] },
-            { name: "Auli", coords: [30.0691, 79.5363] },
-            { name: "Mount Abu", coords: [24.5854, 72.7103] },
-            { name: "Tawang", coords: [27.5542, 91.8594] },
-            { name: "Munsiyari", coords: [30.0650, 80.0602] },
-            { name: "Tirunelveli", coords: [8.7342, 77.7197] },
-            { name: "Kanha National Park", coords: [22.2447, 80.6680] },
-            { name: "Chopta", coords: [30.2042, 79.2714] },
-            { name: "Darjeeling", coords: [27.0350, 88.2636] },
-            { name: "Ziro Valley", coords: [27.5815, 93.8260] },
-            { name: "Lonavala", coords: [18.7500, 73.4092] },
-            { name: "Kumarakom", coords: [9.6007, 76.5156] },
-            { name: "Gulmarg", coords: [34.0510, 74.3738] },
-            { name: "Sundarbans", coords: [22.0800, 88.7950] },
-            { name: "Jaisalmer", coords: [26.9157, 70.9223] },
-            { name: "Rishikesh", coords: [30.1236, 78.3171] }
+            { name: "Rann of Kutch", coords: [23.7333, 70.8007] }
         ];
 
-        // Loop through the stargazing spots and add markers
-        stargazingSpots.forEach(spot => {
-            const marker = L.marker(spot.coords).addTo(map);
-            marker.bindPopup(`
-                <strong>${spot.name}</strong><br>
-                <button onclick="window.open('https://www.google.com/search?q=${spot.name}', '_blank')">Search on Google</button>
-            `);
-        });
+        // Fetching weather and AQI data (example)
+        async function fetchWeatherData(lat, lon) {
+            // Replace with valid API URLs
+            const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=YOUR_API_KEY`;
+            const aqiURL = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=YOUR_API_KEY`;
+
+            try {
+                const weatherResponse = await fetch(weatherURL);
+                const weatherData = await weatherResponse.json();
+                const aqiResponse = await fetch(aqiURL);
+                const aqiData = await aqiResponse.json();
+                return { windspeed: weatherData.wind.speed, aqi: aqiData.data.aqi };
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                return { windspeed: "N/A", aqi: "N/A" };
+            }
+        }
+
+        // Add markers with popups for stargazing locations
+        async function addMarkers() {
+            for (const location of stargazingSpots) {
+                const { name, coords } = location;
+                const [lat, lon] = coords;
+                const { windspeed, aqi } = await fetchWeatherData(lat, lon);
+
+                const marker = L.marker(coords).addTo(map);
+                const suitability = (aqi < 100 && windspeed < 20) ? 'Suitable for Stargazing' : 'Not Suitable for Stargazing';
+                const popupContent = `
+                    <h3>${name}</h3>
+                    <p>Windspeed: ${windspeed} m/s</p>
+                    <p>AQI: ${aqi}</p>
+                    <p>Stargazing Suitability: ${suitability}</p>
+                `;
+                marker.bindPopup(popupContent);
+            }
+        }
+
+        // Add layers control
+        L.control.layers({
+            "OpenStreetMap": baseLayer,
+            "Light Pollution": lightPollutionLayer
+        }).addTo(map);
+
+        lightPollutionLayer.addTo(map); // Add light pollution layer by default
+        addMarkers(); // Add markers and popups
     </script>
 </body>
 </html>
