@@ -42,27 +42,14 @@ async function fetchDetails(lat, lon) {
         const weatherData = await weatherResponse.json();
         const aqiData = await aqiResponse.json();
 
-        console.log("Weather Data:", weatherData);
-        console.log("AQI Data:", aqiData);
-
         const windSpeed = weatherData.wind ? weatherData.wind.speed : null; // Wind speed in m/s
         const aqi = aqiData.data ? aqiData.data.aqi : null; // Air Quality Index
 
-        // Determine suitability for stargazing based on wind speed and AQI
-        let suitability = "Insufficient Data";
-        if (windSpeed !== null && aqi !== null) {
-            if (windSpeed < 8 && aqi < 90) {
-                suitability = "Suitable for Stargazing! 🌌";
-            } else {
-                suitability = "Not Suitable for Stargazing.🚫";
-            }
-        }
-
         // Return all the fetched details
-        return { windSpeed, aqi, suitability };
+        return { windSpeed, aqi };
     } catch (error) {
         console.error('Error fetching data:', error);
-        return { windSpeed: null, aqi: null, suitability: "Error fetching data" };
+        return { windSpeed: null, aqi: null };
     }
 }
 
@@ -77,36 +64,35 @@ function determineLightPollution(aqi) {
     }
 }
 
+// Function to determine suitability for stargazing
+function isSuitableForStargazing(windSpeed, aqi) {
+    if (windSpeed < 8 && aqi < 90) {
+        return "Suitable for Stargazing! 🌌";
+    } else {
+        return "Not Suitable for Stargazing 🚫";
+    }
+}
+
 // Add markers for each spot and fetch dynamic data
 stargazingSpots.forEach(async (spot) => {
     // Fetch weather, AQI, and suitability data
-    const { windSpeed, aqi, suitability } = await fetchDetails(spot.coords[0], spot.coords[1]);
+    const { windSpeed, aqi } = await fetchDetails(spot.coords[0], spot.coords[1]);
+
+    // Determine light pollution level based on AQI
+    const lightPollutionLevel = determineLightPollution(aqi);
+
+    // Determine stargazing suitability based on wind speed and AQI
+    const suitability = isSuitableForStargazing(windSpeed, aqi);
 
     // Primary marker: Weather, AQI, Suitability
     const marker = L.marker(spot.coords).addTo(map);
 
-    // Light pollution data (based on AQI)
-    const lightPollutionLevel = determineLightPollution(aqi);
-
-    // Bind popup with wind speed, AQI, and suitability info
+    // Bind popup with wind speed, AQI, light pollution level, and suitability for stargazing
     marker.bindPopup(`
         <b>${spot.name}</b><br>
-        Wind Speed: ${windSpeed !== null ? `${windSpeed} m/s` : "N/A"}<br>
-        AQI: ${aqi !== null ? aqi : "N/A"}<br>
-        Suitability: ${suitability}<br>
-        Light Pollution: ${lightPollutionLevel}
-    `);
-
-    // Secondary marker: Light pollution data
-    const lightPollutionMarker = L.circleMarker(spot.coords, {
-        color: 'blue',
-        radius: 8,
-        fillOpacity: 0.5
-    }).addTo(map);
-
-    lightPollutionMarker.bindPopup(`
-        <b>${spot.name} (Light Pollution)</b><br>
-        AQI: ${aqi !== null ? aqi : "N/A"}<br>
-        Light Pollution: ${lightPollutionLevel}
+        <b>Wind Speed:</b> ${windSpeed !== null ? `${windSpeed} m/s` : "N/A"}<br>
+        <b>AQI:</b> ${aqi !== null ? aqi : "N/A"}<br>
+        <b>Light Pollution:</b> ${lightPollutionLevel}<br>
+        <b>Suitability for Stargazing:</b> ${suitability}
     `);
 });
