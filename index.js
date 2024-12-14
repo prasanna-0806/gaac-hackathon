@@ -24,7 +24,22 @@ const stargazingSpots = [
     { name: "Mahabaleshwar", coords: [17.9235, 73.6586] },
     { name: "Savandurga Hills", coords: [12.9192, 77.2920] },
     { name: "Nandi Hills", coords: [13.3702, 77.6835] },
-    { name: "Coorg", coords: [12.3375, 75.8069] }
+    { name: "Coorg", coords: [12.3375, 75.8069] },
+    { name: "Auli", coords: [30.0691, 79.5363] }, // Auli in Uttarakhand
+    { name: "Mount Abu", coords: [24.5854, 72.7103] }, // Mount Abu in Rajasthan
+    { name: "Tawang", coords: [27.5542, 91.8594] }, // Tawang in Arunachal Pradesh
+    { name: "Munsiyari", coords: [30.0650, 80.0602] }, // Munsiyari in Uttarakhand
+    { name: "Tirunelveli", coords: [8.7342, 77.7197] }, // Tirunelveli in Tamil Nadu
+    { name: "Kanha National Park", coords: [22.2447, 80.6680] }, // Kanha National Park in Madhya Pradesh
+    { name: "Chopta", coords: [30.2042, 79.2714] }, // Chopta in Uttarakhand
+    { name: "Darjeeling", coords: [27.0350, 88.2636] }, // Darjeeling in West Bengal
+    { name: "Ziro Valley", coords: [27.5815, 93.8260] }, // Ziro Valley in Arunachal Pradesh
+    { name: "Lonavala", coords: [18.7500, 73.4092] }, // Lonavala in Maharashtra
+    { name: "Kumarakom", coords: [9.6007, 76.5156] }, // Kumarakom in Kerala
+    { name: "Gulmarg", coords: [34.0510, 74.3738] }, // Gulmarg in Jammu & Kashmir
+    { name: "Sundarbans", coords: [22.0800, 88.7950] }, // Sundarbans in West Bengal
+    { name: "Jaisalmer", coords: [26.9157, 70.9223] }, // Jaisalmer in Rajasthan
+    { name: "Rishikesh", coords: [30.1236, 78.3171] } // Rishikesh in Uttarakhand
 ];
 
 // Function to fetch weather, AQI data
