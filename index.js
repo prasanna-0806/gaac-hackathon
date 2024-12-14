@@ -106,7 +106,7 @@ async function addMarkers() {
             <p>Windspeed: ${windspeed} m/s</p>
             <p>AQI: ${aqi}</p>
             <p>Stargazing Suitability: ${suitability}</p>
-            <p>Light Pollution: ${level} - <span style="color:${color};">${level}</span></p>
+            <p>Light Pollution: - <span style="color:${color};">${level}</span></p>
             <button onclick="window.open('https://www.google.com/maps/search/?q=${name}')">Search on Google</button>
             <br>
             <button onclick="window.open('https://www.lightpollutionmap.info/#zoom=6&lat=${lat}&lon=${lon}&layers=B0TFFFFF')">View Light Pollution Map</button>
