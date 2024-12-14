@@ -87,7 +87,7 @@ async function addMarkers() {
             <p>Windspeed: ${windspeed} m/s</p>
             <p>AQI: ${aqi}</p>
             <p>Stargazing Suitability: ${suitability}</p>
-            <button onclick="window.open('https://www.google.com/maps/search/?q=${name}')">Search on Google</button>
+            <button onclick="window.open('https://www.google.com/search/?q=${name}')">Search on Google</button>
         `;
 
         // Bind popup to the marker
