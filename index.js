@@ -8,7 +8,7 @@ const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.pn
 }).addTo(map);
 
 // Add the Light Pollution Map tile layer (replace with correct URL)
-const lightPollutionLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+const lightPollutionLayer = L.tileLayer("https://www.lightpollutionmap.info/#zoom=4.43&lat=31.8074&lon=80.2820&state=eyJiYXNlbWFwIjoiTGF5ZXJCaW5nUm9hZCIsIm92ZXJsYXkiOiJ3YV8yMDE1Iiwib3ZlcmxheWNvbG9yIjpmYWxzZSwib3ZlcmxheW9wYWNpdHkiOjYwLCJmZWF0dXJlc29wYWNpdHkiOjg1fQ==", {
     attribution: '© OpenStreetMap contributors | Light Pollution Map',
     maxZoom: 18,
     opacity: 0.6 // Adjust opacity to blend with other layers
