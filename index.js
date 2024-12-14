@@ -35,18 +35,18 @@ const stargazingSpots = [
 ];
 
 // OpenWeatherMap API key
-const weatherApiKey = 'e943ba1a3f38663ee66ba362f50a008a'; // Replace with your OpenWeatherMap API key
-const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
+const weatherApiKey = 'YOUR_WEATHER_API_KEY'; // Replace with your OpenWeatherMap API key
+const airQualityApiKey = 'YOUR_AQI_API_KEY'; // Replace with your AQI API key
 
 // Function to categorize AQI into pollution levels
 function getPollutionLevel(aqi) {
-    if (aqi <= 90) {
+    if (aqi <= 50) {
         return { level: "Good", color: "green" };
-    } else if (aqi <= 130) {
+    } else if (aqi <= 100) {
         return { level: "Moderate", color: "yellow" };
-    } else if (aqi <= 180) {
+    } else if (aqi <= 150) {
         return { level: "Unhealthy for Sensitive Groups", color: "orange" };
-    } else if (aqi <= 240) {
+    } else if (aqi <= 200) {
         return { level: "Unhealthy", color: "red" };
     } else if (aqi <= 300) {
         return { level: "Very Unhealthy", color: "purple" };
@@ -99,15 +99,18 @@ async function addMarkers() {
         // Create marker for the location
         const marker = L.marker(coords).addTo(map);
 
+        // Create a URL for the Light Pollution Map
+        const lightPollutionUrl = `https://www.lightpollutionmap.info/#zoom=10.00&lat=${lat}&lon=${lon}&state=eyJiYXNlbWFwIjoiTGF5ZXJCaW5nUm9hZCIsIm92ZXJsYXkiOiJ3YV8yMDE1Iiwib3ZlcmxheWNvbG9yIjpmYWxzZSwib3ZlcmxheW9wYWNpdHkiOjYwLCJmZWF0dXJlc29wYWNpdHkiOjg1fQ==`;
+
         // Create a popup with windspeed, AQI, and suitability message
         const suitability = (aqi < 100 && windspeed < 20) ? 'Suitable for Stargazing' : 'Not Suitable for Stargazing';
         const popupContent = `
             <h3>${name}</h3>
             <p>Windspeed: ${windspeed} m/s</p>
-            <p>AQI: ${aqi}</p>
+            <p>AQI: ${aqi} - <span style="color:${color};">${level}</span></p>
             <p>Stargazing Suitability: ${suitability}</p>
-            <p>Light Pollution: ${level} - <span style="color:${color};">${level}</span></p>
-            <button onclick="window.open('https://www.google.com/maps/search/?q=${name}')">Search on Google</button>
+            <p>Light Pollution: ${level}</p>
+            <button onclick="window.open('${lightPollutionUrl}')">View Light Pollution Map</button>
         `;
 
         // Bind popup to the marker
