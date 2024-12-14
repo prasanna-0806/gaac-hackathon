@@ -13,67 +13,50 @@ const stargazingSpots = [
     { name: "Rann of Kutch", coords: [23.7333, 70.8007] },
     { name: "Ladakh", coords: [34.1526, 77.5770] },
     { name: "Spiti Valley", coords: [32.2464, 78.0172] },
-    { name: "Mahabaleshwar", coords: [17.9235, 73.6586] },
-    { name: "Savandurga Hills", coords: [12.9192, 77.2920] },
-    { name: "Nandi Hills", coords: [13.3702, 77.6835] },
-    { name: "Coorg", coords: [12.3375, 75.8069] }
 ];
 
-// Function to fetch weather, AQI, and light pollution data
-async function fetchDetails(lat, lon) {
-    const weatherApiKey = 'e943ba1a3f38663ee66ba362f50a008a'; // Replace with your OpenWeatherMap API key
-    const airQualityApiKey = 'a87d60b45493985ee0c842179fd66174a556f4fe'; // Replace with your AQI API key
+// API URL to fetch wind speed data
+const apiURL = "https://api.open-meteo.com/v1/forecast?latitude=13.6601,23.7333,34.1526,32.2464&longitude=78.3992,70.8007,77.577,78.0172&hourly=wind_speed_10m";
 
+// Fetch wind speed data
+async function fetchWindSpeedData() {
     try {
-        // Fetch weather and AQI data
-        const [weatherResponse, aqiResponse] = await Promise.all([
-            fetch(https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}),
-            fetch(https://api.waqi.info/feed/here/?token=${airQualityApiKey})
-        ]);
-
-        const weatherData = await weatherResponse.json();
-        const aqiData = await aqiResponse.json();
-
-        // Log API responses to check the structure
-        console.log("Weather Data:", weatherData);
-        console.log("AQI Data:", aqiData);
-
-        const windSpeed = weatherData.wind ? weatherData.wind.speed : null; // Wind speed in m/s
-        const aqi = aqiData.data ? aqiData.data.aqi : null; // Air Quality Index
-
-        // Determine suitability for stargazing based on wind speed and AQI
-        let suitability = "Insufficient Data";
-        if (windSpeed !== null && aqi !== null) {
-            if (windSpeed < 8 && aqi < 90) {
-                suitability = "Suitable for Stargazing! 🌌";
-            } else {
-                suitability = "Not Suitable for Stargazing.🚫";
-            }
-        }
-
-        // Return all the fetched details
-        return { windSpeed, aqi, suitability };
+        const response = await fetch(apiURL);
+        const data = await response.json();
+        console.log("API Response:", data);
+        return data.hourly.wind_speed_10m; // Assuming wind speed data is in hourly.wind_speed_10m
     } catch (error) {
-        console.error('Error fetching data:', error);
-        return { windSpeed: null, aqi: null, suitability: "Error fetching data" };
+        console.error('Error fetching wind speed data:', error);
+        return [];
     }
 }
 
-// Add markers for each spot and fetch dynamic data
-stargazingSpots.forEach(async (spot) => {
-    const marker = L.marker(spot.coords).addTo(map);
+// Map data to stargazing spots
+async function integrateWindSpeed() {
+    const windSpeeds = await fetchWindSpeedData();
 
-    // Fetch dynamic data (weather, AQI, suitability)
-    const { windSpeed, aqi, suitability } = await fetchDetails(spot.coords[0], spot.coords[1]);
+    if (windSpeeds.length === 0) {
+        console.error("No wind speed data available");
+        return;
+    }
 
-    // Log the data being used in the popup
-    console.log(Data for ${spot.name}: Wind Speed - ${windSpeed}, AQI - ${aqi}, Suitability - ${suitability});
+    stargazingSpots.forEach((spot, index) => {
+        const marker = L.marker(spot.coords).addTo(map);
 
-    // Add a detailed popup with all the fetched data
-    marker.bindPopup(`
-        <b>${spot.name}</b><br>
-        Wind Speed: ${windSpeed !== null ? ${windSpeed} m/s : "N/A"}<br>
-        AQI: ${aqi !== null ? aqi : "N/A"}<br>
-        ${suitability}
-    `);
-});
+        // Assuming windSpeeds[index] matches spot's index
+        const windSpeed = windSpeeds[index] || "N/A";
+
+        // Determine suitability
+        const suitability = windSpeed < 8 ? "Suitable for Stargazing! 🌌" : "Not Suitable for Stargazing.🚫";
+
+        // Add popup to marker
+        marker.bindPopup(`
+            <b>${spot.name}</b><br>
+            Wind Speed: ${windSpeed} m/s<br>
+            ${suitability}
+        `);
+    });
+}
+
+// Integrate data and update map
+integrateWindSpeed();
